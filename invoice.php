@@ -55,12 +55,8 @@
     <?php
     if (isset($_POST['selectedBlocks'])) {
         $selectedBlocks = json_decode($_POST['selectedBlocks'], true);
-
-        // Read JSON data from data.json
         $jsonData = file_get_contents('data.json');
         $data = json_decode($jsonData, true);
-
-        echo '<div id="invoice-blocks">';
         foreach ($data as $block) {
             if (in_array($block['title'], $selectedBlocks)) {
                 echo '<div class="block">';
@@ -68,10 +64,9 @@
                 echo '<img src="' . $block['icon'] . '" alt="' . $block['title'] . '">';
                 echo '</div>';
                 echo '<div class="info">';
-                // Add the blue line before the title
-                echo '<h2><span class="blue-line">' . $block['title'] . '</span></h2>';
+                echo '<h2>' . $block['title'] . '</h2>';
                 echo '<p>' . $block['description'] . '</p>';
-                echo '<ul style="list-style-type: disc; padding-left: 20px;">';
+                echo '<ul>';
                 foreach ($block['bulletpoints'] as $point) {
                     echo '<li>' . $point . '</li>';
                 }
@@ -80,13 +75,61 @@
                 echo '</div>';
             }
         }
-        echo '</div>';
     } else {
         echo '<p>No blocks are selected in the invoice.</p>';
     }
     ?>
-
 </div>
+
+<div>
+    <h2>The following Audit Areas are not necessarily necessary, but can be added:</h2>
+    <div id="unselected-blocks">
+        <?php
+        foreach ($data as $block) {
+            if (!in_array($block['title'], $selectedBlocks)) {
+                echo '<div class="block unselected" data-block-id="' . htmlspecialchars($block['title']) . '" 
+                        onclick="moveToSelected(this)">';
+                echo '<div class="icon">';
+                echo '<img src="' . $block['icon'] . '" alt="' . $block['title'] . '">';
+                echo '</div>';
+                echo '<div class="info">';
+                echo '<h2>' . $block['title'] . '</h2>';
+                echo '<p>' . $block['description'] . '</p>';
+                echo '<ul>';
+                foreach ($block['bulletpoints'] as $point) {
+                    echo '<li>' . $point . '</li>';
+                }
+                echo '</ul>';
+                echo '</div>';
+                echo '</div>';
+            }
+        }
+        ?>
+    </div>
+</div>
+
+<script>
+    function addToOrder(blockTitle) {
+        let selectedBlocks = <?php echo json_encode($selectedBlocks); ?>;
+
+        // Add the block title to the selected blocks array
+        selectedBlocks.push(blockTitle);
+
+        // Update the hidden input with the updated selected blocks array
+        document.getElementById('selectedBlocksInput').value = JSON.stringify(selectedBlocks);
+
+        // Resubmit the form
+        document.getElementById('offer-form').submit();
+    }
+    function moveToSelected(block) {
+        const selectedBlocksDiv = document.getElementById('invoice-blocks');
+        block.onclick = null; // remove the click event handler
+        block.classList.remove('unselected');
+        selectedBlocksDiv.appendChild(block.cloneNode(true)); // append a clone of the block to selected section
+        block.remove(); // remove the original block from the unselected section
+    }
+
+</script>
 
 <!-- Add styling for the selected blocks -->
 <style>
