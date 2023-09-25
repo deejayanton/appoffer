@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice</title>
     <link rel="stylesheet" href="invoice.css">
-
 </head>
 <body>
 <div id="header-container">
@@ -50,7 +49,7 @@
     type specimen book.
 </p>
 
-<div id="invoice-blocks">
+<div id="selected-blocks">
     <!-- Display the selected blocks from JSON data -->
     <?php
     if (isset($_POST['selectedBlocks'])) {
@@ -64,9 +63,9 @@
                 echo '<img src="' . $block['icon'] . '" alt="' . $block['title'] . '">';
                 echo '</div>';
                 echo '<div class="info">';
-                echo '<h2>' . $block['title'] . '</h2>';
+                echo '<h2><span class="blue-line">' . $block['title'] . '</span></h2>'; // changed line
                 echo '<p>' . $block['description'] . '</p>';
-                echo '<ul>';
+                echo '<ul style="list-style-type: disc; padding-left: 20px;">'; // added styling for bullet points
                 foreach ($block['bulletpoints'] as $point) {
                     echo '<li>' . $point . '</li>';
                 }
@@ -82,7 +81,8 @@
 </div>
 
 <div>
-    <h2>The following Audit Areas are not necessarily necessary, but can be added:</h2>
+    <h2 class="unselected-heading">The following Audit Areas are not necessarily necessary, but can be added:</h2>
+
     <div id="unselected-blocks">
         <?php
         foreach ($data as $block) {
@@ -109,29 +109,13 @@
 </div>
 
 <script>
-    function addToOrder(blockTitle) {
-        let selectedBlocks = <?php echo json_encode($selectedBlocks); ?>;
-
-        // Add the block title to the selected blocks array
-        selectedBlocks.push(blockTitle);
-
-        // Update the hidden input with the updated selected blocks array
-        document.getElementById('selectedBlocksInput').value = JSON.stringify(selectedBlocks);
-
-        // Resubmit the form
-        document.getElementById('offer-form').submit();
-    }
     function moveToSelected(block) {
-        const selectedBlocksDiv = document.getElementById('invoice-blocks');
+        const selectedBlocksDiv = document.getElementById('selected-blocks');
         block.onclick = null; // remove the click event handler
         block.classList.remove('unselected');
-        selectedBlocksDiv.appendChild(block.cloneNode(true)); // append a clone of the block to selected section
-        block.remove(); // remove the original block from the unselected section
+        selectedBlocksDiv.appendChild(block);
     }
-
 </script>
-
-<!-- Add styling for the selected blocks -->
 <style>
     #invoice-blocks ul {
         list-style: none;
@@ -169,7 +153,8 @@
         margin-right: 1cm;
     }
 
-    @media print {
+    @media print  {
+
         body {
             -webkit-print-color-adjust: exact; /* Chrome, Safari */
             color-adjust: exact; /* Firefox */
@@ -178,14 +163,34 @@
         .icon img {
             margin-left: 40px; /* Add a margin to the left for images inside the block during printing */
         }
+        /* .block.unselected, .unselected-heading{
+            display: none;
+        } */
+        .block, .unselected-heading, #unselected-blocks {
+            page-break-inside: avoid !important;
+        }
+        * {
+            float: none;
+            position: static;
+        }
+
+        @page {
+            size: 12in 17in;
+            margin: 2cm;
+        }
+        body {
+            width: 90%;
+            height: 100%;
+        }
     }
+
 
     /* h1 span {
          background-color: #000 !important;
          height: 5px !important;
          /* Print-specific styles */
     }
-    /*.blue-line {
+        blue-line {
         border-left: 4px solid blue;
         padding-left: 8px;
         border-top-left-radius: 2px;
