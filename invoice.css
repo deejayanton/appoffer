@@ -17,6 +17,7 @@ body{
     transition: background-color 0.3s ease;
     justify-content: space-between;
     margin-bottom: 10px; /* Added margin-bottom */
+    page-break-inside: auto;
 }
 .icon {
     display: flex;
@@ -49,10 +50,7 @@ body{
 }
 .info ul {
     margin-bottom: 0;
-
 }
-
-
 .selected {
     background-color: #7d9bf5;
     color: #fff;
