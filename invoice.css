@@ -130,3 +130,38 @@ body{
     margin-left: 1cm;
     margin-right: 1cm;
 }
+@media print {
+    #unselected-section {
+        page-break-inside: avoid;
+    }
+    body {
+        -webkit-print-color-adjust: exact; /* Chrome, Safari */
+        color-adjust: exact; /* Firefox */
+    }
+
+    .icon img {
+        margin-left: 40px; /* Add a margin to the left for images inside the block during printing */
+    }
+
+    /* .block.unselected, .unselected-heading{
+        display: none;
+    } */
+    .block, .unselected-heading, #unselected-blocks {
+        page-break-inside: auto;
+    }
+
+    * {
+        float: none;
+        position: static;
+    }
+
+    @page {
+        size: 12in 17in;
+        margin: 2cm;
+    }
+
+    body {
+        width: 90%;
+        height: 100%;
+    }
+}
