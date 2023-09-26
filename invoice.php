@@ -52,6 +52,13 @@
 <div id="selected-blocks">
     <!-- Display the selected blocks from JSON data -->
     <?php
+    if (file_exists('data.json')) {
+        $jsonData = file_get_contents('data.json');
+        $data = json_decode($jsonData, true);
+    } else {
+        echo '<p>Unable to load data.</p>';
+        exit; // Ensure to exit here, as continuing further does not make sense without data.
+    }
     if (isset($_POST['selectedBlocks'])) {
         $selectedBlocks = json_decode($_POST['selectedBlocks'], true);
         $jsonData = file_get_contents('data.json');
@@ -79,34 +86,32 @@
     }
     ?>
 </div>
-
-<div>
+<div id="unselected-section">
     <h2 class="unselected-heading">The following Audit Areas are not necessarily necessary, but can be added:</h2>
-
     <div id="unselected-blocks">
-        <?php
-        foreach ($data as $block) {
-            if (!in_array($block['title'], $selectedBlocks)) {
-                echo '<div class="block unselected" data-block-id="' . htmlspecialchars($block['title']) . '" 
+            <?php
+            foreach ($data as $block) {
+                if (!in_array($block['title'], $selectedBlocks)) {
+                    echo '<div class="block unselected" data-block-id="' . htmlspecialchars($block['title']) . '" 
                         onclick="moveToSelected(this)">';
-                echo '<div class="icon">';
-                echo '<img src="' . $block['icon'] . '" alt="' . $block['title'] . '">';
-                echo '</div>';
-                echo '<div class="info">';
-                echo '<h2>' . $block['title'] . '</h2>';
-                echo '<p>' . $block['description'] . '</p>';
-                echo '<ul>';
-                foreach ($block['bulletpoints'] as $point) {
-                    echo '<li>' . $point . '</li>';
+                    echo '<div class="icon">';
+                    echo '<img src="' . $block['icon'] . '" alt="' . $block['title'] . '">';
+                    echo '</div>';
+                    echo '<div class="info">';
+                    echo '<h2>' . $block['title'] . '</h2>';
+                    echo '<p>' . $block['description'] . '</p>';
+                    echo '<ul>';
+                    foreach ($block['bulletpoints'] as $point) {
+                        echo '<li>' . $point . '</li>';
+                    }
+                    echo '</ul>';
+                    echo '</div>';
+                    echo '</div>';
                 }
-                echo '</ul>';
-                echo '</div>';
-                echo '</div>';
             }
-        }
-        ?>
+            ?>
+        </div>
     </div>
-</div>
 
 <script>
     function moveToSelected(block) {
@@ -123,11 +128,14 @@
     }
 
     .block {
+        overflow: auto;
         background-color: #ffffff;
         border: 1px solid #ffffff;
         margin: 10px 0;
         padding: 10px;
         margin-bottom: 30px;
+        page-break-inside: avoid;
+        min-height: 100px;
 
     }
 
@@ -152,51 +160,14 @@
         margin-left: 1cm;
         margin-right: 1cm;
     }
-
-    @media print  {
-
-        body {
-            -webkit-print-color-adjust: exact; /* Chrome, Safari */
-            color-adjust: exact; /* Firefox */
-        }
-
-        .icon img {
-            margin-left: 40px; /* Add a margin to the left for images inside the block during printing */
-        }
-        /* .block.unselected, .unselected-heading{
-            display: none;
-        } */
-        .block, .unselected-heading, #unselected-blocks {
-            page-break-inside: avoid !important;
-        }
-        * {
-            float: none;
-            position: static;
-        }
-
-        @page {
-            size: 12in 17in;
-            margin: 2cm;
-        }
-        body {
-            width: 90%;
-            height: 100%;
-        }
-    }
-
-
-    /* h1 span {
-         background-color: #000 !important;
-         height: 5px !important;
-         /* Print-specific styles */
-    }
-        blue-line {
+    blue-line {
         border-left: 4px solid blue;
         padding-left: 8px;
         border-top-left-radius: 2px;
         border-bottom-left-radius: 2px;
     }
-}
+
+    }
 </style>
 
 </body>
